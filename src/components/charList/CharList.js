@@ -9,31 +9,52 @@ class CharList extends Component {
     state = {
         charList: [],
         loading: true,
-        error: false
+        error: false,
+        offset: 210,
+        newItemsLoading: false,
+        charsEnded: false
     }
     marvelService = new MarvelService();
 
     componentDidMount() {
+        this.onRequest();
+    }
+
+    onRequest = (offset) => {
+        this.onCharsLoading();
         this.marvelService
-            .getAllCharacters()
+            .getAllCharacters(offset)
             .then(this.onCharsLoaded)
             .catch(this.onError);
     }
+
     onError = () => {
         this.setState({
             loading: false,
             error: true
         });
     }
-    onCharsLoaded = (charList) => {
+
+    onCharsLoading = () => {
         this.setState({
-            charList,
-            loading: false
+            newItemsLoading: true,
         });
     }
-    onCharClicked = () => {
-        
+
+    onCharsLoaded = (newCharList) => {
+        let ended = false;
+        if (newCharList.length<9){
+            ended = true
+        }
+        this.setState(({offset, charList})=>({
+            charList: [...charList, ...newCharList],
+            loading: false,
+            offset: offset+9,
+            newItemsLoading: false,
+            charsEnded: ended
+        }))
     }
+
     loadItems(arr) {
         const items = arr.map((item) => {
             const imageClass = item.thumbnail.includes('image_not_available')?'unavailable':null;
@@ -53,7 +74,7 @@ class CharList extends Component {
         )
     }
     render() {
-        const {charList, loading, error} = this.state;
+        const {charList, loading, error, offset, newItemsLoading, charsEnded} = this.state;
         const errorMessage = error ? <ErrorMessage/> : null;
         const spinner = loading ? <Spinner/> : null;
         const content = !(loading||error) ? this.loadItems(charList) : null;
@@ -62,7 +83,11 @@ class CharList extends Component {
                 {spinner}
                 {errorMessage}
                 {content}
-                <button className="button button__main button__long">
+                <button 
+                    style={{"display" : charsEnded ? "none" : 'block'}}
+                    className="button button__main button__long"
+                    onClick={()=>this.onRequest(offset)}
+                    disabled={newItemsLoading}>
                     <div className="inner">load more</div>
                 </button>
             </div>
