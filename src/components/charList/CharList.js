@@ -13,7 +13,8 @@ class CharList extends Component {
         error: false,
         offset: 210,
         newItemsLoading: false,
-        charsEnded: false
+        charsEnded: false,
+        activeChar: null
     }
     marvelService = new MarvelService();
 
@@ -56,13 +57,30 @@ class CharList extends Component {
         }))
     }
 
+    activeOnClick = (id) => {
+        this.setState({
+            activeChar: id
+        })
+    }
+
     loadItems(arr) {
         const items = arr.map((item) => {
             const imageClass = item.thumbnail.includes('image_not_available')?'unavailable':null;
+            let active;
+            if (this.state.activeChar === item.id){
+                active = true;
+            }
+            const charClass = active ? 'char__item char__item_selected' : "char__item";
             return (
-                <li onClick={()=>this.props.onCharSelected(item.id)} 
-                    className="char__item" 
-                    key={item.id}>
+                <li 
+                    className={charClass} 
+                    ref={this.setRef}
+                    tabIndex={0}
+                    key={item.id}
+                    onClick={()=>{
+                        this.props.onCharSelected(item.id);
+                        this.activeOnClick(item.id);
+                    }}>
                         <img src={item.thumbnail} alt="char_image" className={imageClass}/>
                         <div className="char__name">{item.name}</div>
                 </li>
