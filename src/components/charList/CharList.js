@@ -62,7 +62,6 @@ class CharList extends Component {
             activeChar: id
         })
     }
-    
 
     loadItems(arr) {
         const items = arr.map((item) => {
