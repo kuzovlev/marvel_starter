@@ -1,4 +1,4 @@
-import { Component } from 'react';
+import { useState, useEffect } from 'react';
 
 import Spinner from '../spinner/Spinner';
 import ErrorMessage from '../errorMessage/ErrorMessage';
@@ -8,86 +8,90 @@ import PropTypes from 'prop-types';
 
 import './charInfo.scss';
 
-class CharInfo extends Component {
+const CharInfo = (props) => {
 
-    state = {
-        char: null,
-        loading: false,
-        error: false
-    }
+    const [char, setChar] = useState(null);
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState(false);
 
-    marvelService = new MarvelService();
+    const marvelService = new MarvelService();
 
-    componentDidMount() {
-        this.updateChar();
-    }
+    useEffect(() => {
+        updateChar();
+    }, [props.charId])
 
-    componentDidUpdate(prevProps) {
-        if (this.props.charId !== prevProps.charId) {
-            this.updateChar();
-        }
-    }
+    // componentDidMount() {
+    //     this.updateChar();
+    // }
 
-    updateChar = () => {
-        const { charId } = this.props;
+    // componentDidUpdate(prevProps) {
+    //     if (this.props.charId !== prevProps.charId) {
+    //         this.updateChar();
+    //     }
+    // }
+
+    const updateChar = () => {
+        const { charId } = props;
 
         if (!charId) {
             return;
         }
 
-        this.charLoading();
+        charLoading();
 
-        this.marvelService
+        marvelService
             .getCharacter(charId)
-            .then(this.onCharLoaded)
-            .catch(this.onError);
+            .then(onCharLoaded)
+            .catch(onError);
     }
 
-    onCharLoaded = (char) => {
-        this.setState({
-            char,
-            loading: false
-        })
+    const onCharLoaded = (char) => {
+        setChar(char);
+        setLoading(false);
+        // this.setState({
+        //     char,
+        //     loading: false
+        // })
     }
 
-    charLoading = () => {
-        this.setState({
-            loading: true
-        })
+    const charLoading = () => {
+        setLoading(true);
+        // this.setState({
+        //     loading: true
+        // })
     }
 
-    onError = () => {
-        this.setState({
-            loading: false,
-            error: true
-        })
+    const onError = () => {
+        setLoading(false);
+        setError(true);
+        // this.setState({
+        //     loading: false,
+        //     error: true
+        // })
     }
 
-    render() {
-        const { char, loading, error } = this.state;
-        const skeleton = char || loading || error ? null : <Skeleton />;
-        const spinner = loading ? <Spinner /> : null;
-        const errorMessage = error ? <ErrorMessage /> : null;
-        const content = !(error || loading || !char) ? <View char={char} /> : null;
-        return (
-            <div className="char__info">
-                {skeleton}
-                {spinner}
-                {errorMessage}
-                {content}
-            </div>
-        )
-    }
+    const skeleton = char || loading || error ? null : <Skeleton />;
+    const spinner = loading ? <Spinner /> : null;
+    const errorMessage = error ? <ErrorMessage /> : null;
+    const content = !(error || loading || !char) ? <View char={char} /> : null;
+    return (
+        <div className="char__info">
+            {skeleton}
+            {spinner}
+            {errorMessage}
+            {content}
+        </div>
+    )
 }
 
 const View = ({ char }) => {
     const { name, description, thumbnail, homepage, wiki, comics } = char;
-    const imageClass = thumbnail.includes('image_not_available')?'unavailable':null;
+    const imageClass = thumbnail.includes('image_not_available') ? 'unavailable' : null;
 
     return (
         <>
             <div className="char__basics">
-                <img src={thumbnail} alt={name} className={imageClass}/>
+                <img src={thumbnail} alt={name} className={imageClass} />
                 <div>
                     <div className="char__info-name">{name}</div>
                     <div className="char__btns">
