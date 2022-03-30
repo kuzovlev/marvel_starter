@@ -2,9 +2,9 @@
 
 .app {
     &__banner {
-        width: 100%;
+        width: 100%!important;
         background-color: $dark;
-        height: 100px;
+        height: 100px!important;
         padding: 0 25px 0 45px;
         display: grid;
         grid-template-columns: 152px auto 133px;
