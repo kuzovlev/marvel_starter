@@ -2,43 +2,31 @@ import { useState, useEffect } from 'react';
 import ErrorMessage from '../errorMessage/ErrorMessage';
 import Spinner from '../spinner/Spinner';
 import './charList.scss';
-import MarvelService from '../../services/MarvelService';
+import useMarvelService from '../../services/MarvelService';
 import PropTypes from 'prop-types';
 
 
 const CharList = (props) => {
 
     const [charList, setCharList] = useState([]);
-    const [loading, setLoading] = useState(false);
     const [offset, setOffset] = useState(210);
-    const [error, setError] = useState(false);
     const [newItemsLoading, setNewItemsLoading] = useState(false);
     const [charsEnded, setCharsEnded] = useState(false);
     const [activeChar, setActiveChar] = useState(null);
 
 
-    const marvelService = new MarvelService();
+    const {loading, error, getAllCharacters} = useMarvelService();
 
     useEffect(() => {
-        onRequest();
+        onRequest(offset, true);
     }, [])
 
-    const onRequest = (offset) => {
-        onCharsLoading();
-        marvelService
-            .getAllCharacters(offset)
+    const onRequest = (offset, initial) => {
+        initial ? setNewItemsLoading(false) : setNewItemsLoading(true);
+        getAllCharacters(offset)
             .then(onCharsLoaded)
-            .catch(onError);
     }
 
-    const onError = () => {
-        setLoading(false);
-        setError(true);
-    }
-
-    const onCharsLoading = () => {
-        setNewItemsLoading(true);
-    }
 
     const onCharsLoaded = (newCharList) => {
         let ended = false;
@@ -46,7 +34,6 @@ const CharList = (props) => {
             ended = true
         }
         setCharList(charList => [...charList, ...newCharList]);
-        setLoading(false);
         setNewItemsLoading(newItemLoading => false);
         setOffset(offset => offset + 9);
         setCharsEnded(charsEnded => ended);
@@ -57,7 +44,7 @@ const CharList = (props) => {
     }
 
     function loadItems(arr) {
-        const items = arr.map((item) => {
+        const items = arr.map((item, i) => {
             const imageClass = item.thumbnail.includes('image_not_available') ? 'unavailable' : null;
             let active;
             if (activeChar === item.id) {
@@ -85,15 +72,16 @@ const CharList = (props) => {
         )
     }
 
+    const items = loadItems(charList);
+
     const errorMessage = error ? <ErrorMessage /> : null;
-    const spinner = loading ? <Spinner /> : null;
-    const content = !(loading || error) ? loadItems(charList) : null;
+    const spinner = loading && !newItemsLoading ? <Spinner /> : null;
 
     return (
         <div className="char__list">
             {spinner}
             {errorMessage}
-            {content}
+            {items}
             <button
                 style={{ "display": charsEnded ? "none" : 'block' }}
                 className="button button__main button__long"
