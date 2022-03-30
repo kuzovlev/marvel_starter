@@ -19,29 +19,16 @@ const RandomChar = () => {
     const onCharLoaded = (char) => {
         setChar(char);
         setLoading(false);
-        // this.setState(
-        //     {
-        //         char,
-        //         loading: false
-        //     }
-        // );
     }
 
     const onError = () => {
         setLoading(false);
         setError(true);
-        // this.setState({
-        //     loading:false,
-        //     error:true
-        // });
     }
 
     const updateChar = () => {
         if (!loading) {
             setLoading(true);
-            // this.setState({
-            //     loading:true
-            // });
         }
         const id = Math.floor(Math.random() * (1011400 - 1011000) + 1011000);
         marvelService

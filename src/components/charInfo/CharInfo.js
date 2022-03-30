@@ -20,16 +20,6 @@ const CharInfo = (props) => {
         updateChar();
     }, [props.charId])
 
-    // componentDidMount() {
-    //     this.updateChar();
-    // }
-
-    // componentDidUpdate(prevProps) {
-    //     if (this.props.charId !== prevProps.charId) {
-    //         this.updateChar();
-    //     }
-    // }
-
     const updateChar = () => {
         const { charId } = props;
 
@@ -48,26 +38,15 @@ const CharInfo = (props) => {
     const onCharLoaded = (char) => {
         setChar(char);
         setLoading(false);
-        // this.setState({
-        //     char,
-        //     loading: false
-        // })
     }
 
     const charLoading = () => {
         setLoading(true);
-        // this.setState({
-        //     loading: true
-        // })
     }
 
     const onError = () => {
         setLoading(false);
         setError(true);
-        // this.setState({
-        //     loading: false,
-        //     error: true
-        // })
     }
 
     const skeleton = char || loading || error ? null : <Skeleton />;
